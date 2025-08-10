@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using NaughtyAttributes;
 using DG.Tweening;
+using UnityEditor;
 
 namespace Screens
 {
@@ -17,6 +18,7 @@ namespace Screens
     {
         public ScreenType screenType;
         public List<Transform> listOfObjects;
+        public List<Typer> listOfPhrases;
         public bool startHided = false;
 
         [Header("Animation")]
@@ -34,15 +36,17 @@ namespace Screens
         [Button]
         protected virtual void Show()
         {
+            if (!EditorApplication.isPlaying) return;
             ShowObjects();
-            Debug.Log("Show"); 
+            Debug.Log("SCREEN BASE Show"); 
         }
 
         [Button]
         protected virtual void Hide()
         {
+            if (!EditorApplication.isPlaying) return;
             ForceHideObjects();
-            Debug.Log("Hide");
+            Debug.Log("SCREEN BASE Hide");
         }
 
         private void ShowObjects()
@@ -53,8 +57,16 @@ namespace Screens
                 listOfObjects[i].gameObject.SetActive(true);
                 listOfObjects[i].DOScale(0, animationDuration).From().SetDelay(i*delayBetweenObjects);
             }
+            Invoke(nameof(StartType), delayBetweenObjects * listOfObjects.Count);
         }
 
+        private void StartType()
+        {
+            for (int i = 0; i < listOfPhrases.Count; i++)
+            {
+                listOfPhrases[i].StartType();
+            }
+        }
 
         private void ForceHideObjects()
         {
